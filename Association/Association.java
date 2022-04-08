@@ -58,8 +58,8 @@ public class Association<K,V> implements Map.Entry<K,V>
      * @return true iff the keys are equal.
      */
     public boolean equals(Object o){
-        Association otherAssoc = (Association) o;
-        return getKey().equals(otherAssoc.getKey());
+        Association<K,V> _object1 = (Association<K,V>) o;
+        return getKey().equals(_object1.getKey());
     }
     //****************************************************************
     
@@ -69,7 +69,7 @@ public class Association<K,V> implements Map.Entry<K,V>
      * @return A hash code for association.
      */
     public int hashCode(){
-        return getKey().hashCode();
+        return theKey.hashCode();
     }
     //****************************************************************
     
