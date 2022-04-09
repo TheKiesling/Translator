@@ -274,73 +274,88 @@ public class BinarySearchTree<K, V>{
 	 * @return Actual value removed from tree
 	 */
 	private V internalDelete(TreeNode<K, V> actual, K key, boolean isLeft) {
-		V tempValue = null;
-
-		if (!isEmpty()) {
-			int result = keyComparator.compare(root.getKey(), key);
-
-			if (result > 0) 
-				return internalDelete(root.getLeft(), key, true);
-			else if (result < 0) 
-				return internalDelete(root.getRight(), key, false);
-			else { //Root is the removed node
-				tempValue = root.getValue();
-
-				if (count() == 1) { //Root is the only element
-					tempValue = root.getValue();
-					root = null;
-				} else {
-					if (root.getRight() != null) { //Search the right child leftmost
-							
-						TreeNode<K, V> leftOfTheRights = root.getRight();
+		if (actual != null) {
+			int result = keyComparator.compare(actual.getKey(), key);
+			
+			if (result > 0) //search in the left side
+				return internalDelete(actual.getLeft(), key, true);
+			 else if (result < 0) //search in the right side
+				return internalDelete(actual.getRight(), key, false);
+			else { //actual is the node to be deleted
+				
+				//The actual node is a leaft
+				if ( (actual.getLeft() == null) && (actual.getRight() == null) ) { // If is a leaft
+					V tempValue = actual.getValue();
+					if (isLeft) {
+						actual.getParent().setLeft(null);
+						actual.setParent(null);
+					} else {
+						actual.getParent().setRight(null);
+						actual.setParent(null);
+					}
+					count--;
+					return tempValue;
+				} else { //Is intermediate node
+				
+					V tempValue = actual.getValue();
+					
+					if (actual.getRight() != null) { //Search the right child leftmost
 						
-						while(leftOfTheRights.getLeft() != null)  
+						TreeNode<K, V> leftOfTheRights = actual.getRight();
+						
+						while(leftOfTheRights.getLeft() != null) 
 							leftOfTheRights = leftOfTheRights.getLeft(); 
 						
-						
 						//Assigning the left side
-						leftOfTheRights.setLeft(root.getLeft());
+						leftOfTheRights.setLeft(actual.getLeft());
 						if (leftOfTheRights.getLeft() != null)
 							leftOfTheRights.getLeft().setParent(leftOfTheRights);
 						
 						//Assigning the right side
-						if (keyComparator.compare(root.getRight().getKey(), leftOfTheRights.getKey()) != 0) { //Only if the leftOfTheRights is different than root.right
+						if (keyComparator.compare(actual.getRight().getKey(), leftOfTheRights.getKey()) != 0) { //Only if the leftOfTheRights is different than root.right
 							leftOfTheRights.getParent().setLeft(null);
 							
 							TreeNode<K, V> newRootRight = leftOfTheRights;
 							
 							while (newRootRight.getRight() != null) 
 								newRootRight = newRootRight.getRight();
-
-							newRootRight.setRight(root.getRight());
-
+							
+							
+							newRootRight.setRight(actual.getRight());
 							if (newRootRight.getRight() != null) 
-								newRootRight.getRight().setParent(newRootRight);
+								newRootRight.getRight().setParent(newRootRight);;
+							
 							
 						}
-						
-						//Assigning new parents
+						//Assigning the new parentes
 						if (leftOfTheRights.getRight() != null)
 							leftOfTheRights.getRight().setParent(leftOfTheRights);
 						
-						leftOfTheRights.setParent(null);
-						root = leftOfTheRights;
+						//Assigning new son to the parent
+						leftOfTheRights.setParent(actual.getParent());
+						if (isLeft) 
+							leftOfTheRights.getParent().setLeft(leftOfTheRights);
+						 else 
+							leftOfTheRights.getParent().setRight(leftOfTheRights);
+						
+						count--;
+						return tempValue;
 						
 					} else { //Search the left child rightmost
 						
-						TreeNode<K, V> rightOfTheLefts = root.getLeft();
+						TreeNode<K, V> rightOfTheLefts = actual.getLeft();
 						
 						while(rightOfTheLefts.getRight() != null) 
 							rightOfTheLefts = rightOfTheLefts.getRight(); 
 						
 						
 						//Assigning the right side
-						rightOfTheLefts.setRight(root.getRight());
+						rightOfTheLefts.setRight(actual.getRight());
 						if (rightOfTheLefts.getRight() != null)
 							rightOfTheLefts.getRight().setParent(rightOfTheLefts);
 						
-						//Assigning the left side
-						if (keyComparator.compare(root.getLeft().getKey(), rightOfTheLefts.getKey()) != 0) { //Only if the rightOfTheLefts is different than root.left
+						//Assiginig the left side
+						if (keyComparator.compare(actual.getLeft().getKey(), rightOfTheLefts.getKey()) != 0) { //Only if the rightOfTheLefts is different than root.left
 							rightOfTheLefts.getParent().setRight(null);
 							
 							TreeNode<K, V> newRootLeft = rightOfTheLefts;
@@ -348,24 +363,29 @@ public class BinarySearchTree<K, V>{
 							while (newRootLeft.getLeft() != null) 
 								newRootLeft = newRootLeft.getLeft();
 							
-							newRootLeft.setLeft(root.getLeft());
-
+							newRootLeft.setLeft(actual.getLeft());
 							if (newRootLeft.getLeft() != null) 
-								newRootLeft.getLeft().setParent(newRootLeft);
+								newRootLeft.getLeft().setParent(newRootLeft);;
 						}
 						
-						//Assigning the new parentes
+						//Assginig the new parentes
 						if (rightOfTheLefts.getLeft() != null)
 							rightOfTheLefts.getLeft().setParent(rightOfTheLefts);
 						
-						rightOfTheLefts.setParent(null);
-						root = rightOfTheLefts;						
+						rightOfTheLefts.setParent(actual.getParent());
+						if (isLeft) {
+							rightOfTheLefts.getParent().setLeft(rightOfTheLefts);
+						} else {
+							rightOfTheLefts.getParent().setRight(rightOfTheLefts);
+						}
+						count--;
+						return tempValue;
 					}
 				}
-				count--;
 			}
-		}
-		return tempValue;
+			 
+		} else 
+			return null;						
 	}
 	//****************************************************************
 }
